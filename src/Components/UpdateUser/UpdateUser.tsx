@@ -1,23 +1,43 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
  
 
 export default function UpdateUser() {
-    let {register, handleSubmit, formState:{errors}}=useForm()
-      const {id}= useParams()
-      console.log(id)
-    const [user, setUser] = useState([])
-    const [tempUser, settempUser] = useState([])
+  const navigate=useNavigate()
+  const [user, setUser] = useState({})
+  const {id}= useParams()
+    let {register, handleSubmit,setValue, formState:{errors} }=useForm({
+      defaultValues: 
+     { firstName:user.firstName,
+      lastName:user.lastName,
+      email:user.email,
+      phone:user.phone,
+      age:user.age,
+      birthData:user.birthDate},
+    })
+
+    let onSubmit= async(data)=>{
+      try {
+       let response = await axios.post("https://dummyjson.com/users/add",data)
+       console.log(response)
+       toast.success("user updateed successfully")
+       navigate("/dashboard/userlist")
+       
+      } catch (error) {
+       console.log(error)
+       toast.error("faild to update")
+      }
+     }
+  
+    
+
     let updateUser= async() =>{
       try {
         let response = await axios.get(`https://dummyjson.com/users/${id}`)
         setUser(response?.data)
-        settempUser(response?.data)
-        console.log(response?.data.name)
-   
       console.log(response?.data)
       } catch (error) {
         console.log(error)
@@ -27,8 +47,19 @@ export default function UpdateUser() {
     }
 
 useEffect(()=>{
-updateUser()
-    },[])
+setValue('firstName', user.firstName);
+setValue('lastName', user.lastName);
+setValue('age', user.age);
+setValue('email', user.email);
+setValue('phone', user.phone);
+setValue('birthDate', user.birthDate);
+
+    },[user ,setValue])
+
+
+useEffect(()=>{
+  updateUser()
+},[])
   return (
     <div>
       <div className="mx-3">
@@ -36,17 +67,14 @@ updateUser()
       </div>
     <hr />
 
-<form onSubmit={handleSubmit(updateUser)} className='shadow-lg p-4 m-5 rounded'>
-
+    <form onSubmit={handleSubmit(onSubmit)} className='shadow-lg p-4 m-5 rounded'>
       <div className="row">
 <div className="col-md-6">
-
-  <label  className="form-label">user</label>
+  <label  className="form-label">First Name</label>
     <input 
-    type="Name" 
+    type="text" 
     className="form-control" 
   placeholder='Enter Your First Name'
-  value={tempUser.firstName} 
   {...register("firstName",{required:"firstName is required"})}
   />
    
@@ -55,24 +83,22 @@ updateUser()
  </div>
 <div className="col-md-6">
         <label  className="form-label">Last Name</label>
-    <input type="name" 
+    <input type="text" 
     className="form-control" 
   placeholder='Enter Your Last Name'
-  value={user.lastName}
-  {...register("LastName",{required:"LastName is required"})}/>
+  {...register("lastName",{required:"LastName is required"})}/>
   
-  {errors.LastName && (
+  {errors.lastName && (
   <span className='text-danger'>
-    {errors.LastName.message}</span>)}
+    {errors.lastName.message}</span>)}
   </div>
   </div>
       <div className="row my-4">
         <div className="col-md-6">
         <label  className="form-label">Email</label>
-    <input type="email" 
+    <input type="text" 
     className="form-control" 
   placeholder='Enter Your Email'
-  value={user.email}
   {...register("email",{required:"Email is required" , pattern:{
     value:/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,message:"this email not valid"
   } })}
@@ -87,7 +113,6 @@ updateUser()
     <input type="number" 
     className="form-control" 
   placeholder='Enter Your Age'
-  value={user.age}
   {...register("age",{required:"Age is required", min:{value:0 , message:"age should not be less than 0" },max:{
     value:50, message:"age should not be more than 50"
   }})}
@@ -101,10 +126,9 @@ updateUser()
       <div className="row">
         <div className="col-md-6">
         <label  className="form-label">Phone Number</label>
-    <input type="phone" 
+    <input type="text" 
     className="form-control" 
   placeholder='Enter Your phone number'
-  value={user.phone} 
   {...register("phone",{required:"phone is required"})}
   />
 
@@ -116,7 +140,6 @@ updateUser()
     <input type="text" 
     className="form-control" 
   placeholder='Enter Your Birth Date'
-  value={user.birthDate}
   {...register("birthDate",{required:"birthDate is required"})}
   />
  
@@ -126,10 +149,9 @@ updateUser()
         
       </div>
       <div className='text-center'>
-      <button className='btn btn-warning text-white w-50 my-5 m-auto'>update</button>
+      <button className='btn btn-warning text-white w-50 my-5 m-auto'>Update</button>
    
       </div>
-     
       </form>
     
     </div>
