@@ -18,6 +18,7 @@ export default function UserList() {
     setShow(true)
     setUserId(user.id)
     setUserData(user)
+
   };
   let navigate= useNavigate()
   const [users, setUsers] = useState([])
@@ -25,6 +26,7 @@ let getUsers =async () =>{
   try { 
     let response =await axios.get("https://dummyjson.com/users")
     setUsers(response?.data?.users)
+    console.log(userId)
   } catch (error) {
     console.log(error)
   }
@@ -49,7 +51,7 @@ useEffect(()=>{
 },[])
 
   return (
-    <div>
+    <div className='list'>
      <div className="d-flex justify-content-between align-items-center mx-3 mt-3">
       <h3>User List</h3>
       <button onClick={navigateToAddUser} className='btn btn-warning text-white'>
@@ -82,8 +84,8 @@ useEffect(()=>{
 <td>{user.email}</td>
 <td>{user.phone}</td>
 <td>{user.birthDate}</td>
-<td> <Link to={`/dashboard/updateuser/${user.id}`}> <CiEdit onClick={()=>updateUser(id)} className='text-warning ' size={30}/></Link></td>
-<td><MdDelete onClick={()=>handleShow(user)} className='text-danger ' size={30}/></td>
+<td> <Link to={`/dashboard/updateuser/${user.id}`}> <CiEdit onClick={()=>navigate("/dashboard/profile")} className='text-warning ' size={25}/></Link></td>
+<td><MdDelete onClick={()=>handleShow(user)} className='text-danger ' size={25}/></td>
 </tr>
 
 ))}
